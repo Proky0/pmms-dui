@@ -210,11 +210,16 @@ function createAudioColor(media) {
 
   console.log(`SRC: ${JSON.stringify(image.src)}`);
 
-  Vibrant.from(image)
-    .quality(1)
-    .clearFilters()
-    .getPalette()
-    .then((palette) => console.log(JSON.stringify(palette)));
+  Vibrant.from(screenshot).getPalette((error, palette) => {
+    if (error) return;
+
+    console.log(`Vibrant: ${palette.Vibrant.rgb}`);
+    console.log(`DarkVibrant: ${palette.DarkVibrant.rgb}`);
+    console.log(`LightVibrant: ${palette.LightVibrant.rgb}`);
+    console.log(`Muted: ${palette.Muted.rgb}`);
+    console.log(`DarkMuted: ${palette.DarkMuted.rgb}`);
+    console.log(`LightMuted: ${palette.LightMuted.rgb}`);
+  });
 }
 
 function showLoadingIcon() {
