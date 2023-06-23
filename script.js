@@ -205,8 +205,6 @@ function getAverageFrequencyValues(media) {
   analyser.fftSize = 4096;
   analyser.smoothingTimeConstant = 0.8;
 
-  source.connect(analyser);
-
   const types = {
     bass: {
       from: 20,
@@ -239,6 +237,8 @@ function getAverageFrequencyValues(media) {
 
   analyser.getByteFrequencyData(frequencyData);
 
+  source.connect(analyser);
+
   const output = {};
 
   for (const key in types) {
@@ -257,24 +257,6 @@ function getAverageFrequencyValues(media) {
   }
 
   return output;
-}
-
-function createAudioColor(handle, media) {
-  Vibrant.from(image.src).getPalette((error, palette) => {
-    if (error) return;
-
-    sendMessage("colorData", {
-      handle: handle,
-      colors: {
-        Vibrant: palette.Vibrant.rgb,
-        DarkVibrant: palette.DarkVibrant.rgb,
-        LightVibrant: palette.LightVibrant.rgb,
-        Muted: palette.Muted.rgb,
-        DarkMuted: palette.DarkMuted.rgb,
-        LightMuted: palette.LightMuted.rgb,
-      },
-    });
-  });
 }
 
 function showLoadingIcon() {
