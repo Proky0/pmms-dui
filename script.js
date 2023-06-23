@@ -195,11 +195,11 @@ function createAudioVisualization(player, visualization) {
 function getAverageFrequencyValues(handle, media) {
   var context = new (window.AudioContext || window.webkitAudioContext)();
 
-  var video = media.youTubeApi
+  var html5Player = media.youTubeApi
     .getIframe()
-    .contentDocument.getElementsByTagName("video")[0];
+    .contentWindow.document.querySelector(".html5-main-video");
 
-  var source = context.createMediaElementSource(video);
+  var source = context.createMediaElementSource(html5Player);
   var analyser = context.createAnalyser();
 
   analyser.fftSize = 4096;
@@ -256,30 +256,10 @@ function getAverageFrequencyValues(handle, media) {
       (highIndex - lowIndex);
   }
 
-  sendMessage("frequencyData", {
-    handle: handle,
-    levels: output,
-  });
-
   return output;
 }
 
 function createAudioColor(handle, media) {
-  var video = media.youTubeApi
-    .getIframe()
-    .contentDocument.getElementsByTagName("video")[0];
-  var canvas = document.createElement("canvas");
-
-  canvas.width = video.clientWidth;
-  canvas.height = video.clientHeight;
-  canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  const image = new Image();
-
-  image.width = canvas.width;
-  image.height = canvas.height;
-  image.src = canvas.toDataURL();
-
   Vibrant.from(image.src).getPalette((error, palette) => {
     if (error) return;
 
@@ -427,8 +407,47 @@ function initPlayer(id, handle, options) {
           media.pmms.visualizationAdded = true;
         }
 
-        setInterval(() => createAudioColor(handle, media), 500);
-        setInterval(() => getAverageFrequencyValues(handle, media), 50);
+        setInterval(() => {
+          sendMessage("frequencyData", {
+            handle: handle,
+            levels: getAverageFrequencyValues(media),
+          });
+        }, 50);
+
+        setInterval(() => {
+          var video = media.youTubeApi
+            .getIframe()
+            .contentDocument.getElementsByTagName("video")[0];
+          var canvas = document.createElement("canvas");
+
+          canvas.width = video.clientWidth;
+          canvas.height = video.clientHeight;
+          canvas
+            .getContext("2d")
+            .drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          const image = new Image();
+
+          image.width = canvas.width;
+          image.height = canvas.height;
+          image.src = canvas.toDataURL();
+
+          Vibrant.from(image.src).getPalette((error, palette) => {
+            if (error) return;
+
+            sendMessage("colorData", {
+              handle: handle,
+              colors: {
+                Vibrant: palette.Vibrant.rgb,
+                DarkVibrant: palette.DarkVibrant.rgb,
+                LightVibrant: palette.LightVibrant.rgb,
+                Muted: palette.Muted.rgb,
+                DarkMuted: palette.DarkMuted.rgb,
+                LightMuted: palette.LightMuted.rgb,
+              },
+            });
+          });
+        }, 500);
       });
 
       media.play();
