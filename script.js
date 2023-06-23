@@ -195,21 +195,9 @@ function createAudioVisualization(player, visualization) {
 function getAverageFrequencyValues(player) {
   var context = new (window.AudioContext || window.webkitAudioContext)();
 
-  var source;
-
-  if (player.youTubeApi) {
-    var html5Player = player.youTubeApi
-      .getIframe()
-      .contentWindow.document.querySelector(".html5-main-video");
-
-    source = context.createMediaElementSource(html5Player);
-  } else if (player.hlsPlayer) {
-    source = context.createMediaElementSource(player.hlsPlayer.media);
-  } else if (player.originalNode) {
-    source = context.createMediaElementSource(player.originalNode);
-  } else {
-    source = context.createMediaElementSource(player);
-  }
+  var audio = media.youTubeApi
+    .getIframe()
+    .contentDocument.getElementsByTagName("audio")[0];
 
   var analyser = context.createAnalyser();
 
@@ -248,7 +236,7 @@ function getAverageFrequencyValues(player) {
 
   analyser.getByteFrequencyData(frequencyData);
 
-  source.connect(analyser);
+  audio.connect(analyser);
   analyser.connect(context.destination); //playback audio
 
   const output = {};
