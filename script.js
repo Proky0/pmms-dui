@@ -203,15 +203,13 @@ function createAudioColor() {
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
   var base64ImageData = canvas.toDataURL("image/jpeg");
+  console.log(base64ImageData);
 
-  var v = new Vibrant(base64ImageData);
-  v.getPalette((error, palette) => {
-    console.log(`Error: ${error}, Palette: ${JSON.stringify(palette)}`);
-  });
-
-  /*   Vibrant.from(base64ImageData).getPalette((error, palette) => {
-    console.log(`Error: ${error}, Palette: ${JSON.stringify(palette)}`);
-  }); */
+  Vibrant.from(base64ImageData)
+    .quality(1)
+    .clearFilters()
+    .getPalette()
+    .then((palette) => console.log(palette));
 }
 
 function showLoadingIcon() {
