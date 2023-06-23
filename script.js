@@ -192,8 +192,8 @@ function createAudioVisualization(player, visualization) {
   wave.fromElement(html5Player.id, waveCanvas.id, options);
 }
 
-function getAverageFrequencyValues(media) {
-  var context = new window.AudioContext();
+function getAverageFrequencyValues(handle, media) {
+  var context = new (window.AudioContext || window.webkitAudioContext)();
 
   var video = media.youTubeApi
     .getIframe()
@@ -264,7 +264,7 @@ function getAverageFrequencyValues(media) {
   return output;
 }
 
-function createAudioColor(media) {
+function createAudioColor(handle, media) {
   var video = media.youTubeApi
     .getIframe()
     .contentDocument.getElementsByTagName("video")[0];
@@ -427,8 +427,8 @@ function initPlayer(id, handle, options) {
           media.pmms.visualizationAdded = true;
         }
 
-        setInterval(() => createAudioColor(media), 500);
-        setInterval(() => getAverageFrequencyValues(media), 50);
+        setInterval(() => createAudioColor(handle, media), 500);
+        setInterval(() => getAverageFrequencyValues(handle, media), 50);
       });
 
       media.play();
