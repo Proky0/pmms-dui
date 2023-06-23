@@ -192,7 +192,7 @@ function createAudioVisualization(player, visualization) {
   wave.fromElement(html5Player.id, waveCanvas.id, options);
 }
 
-function createAudioColor() {
+async function createAudioColor() {
   var canvas = document.createElement("canvas");
   var video = document.querySelector("video");
   var ctx = canvas.getContext("2d");
@@ -204,7 +204,7 @@ function createAudioColor() {
 
   var base64ImageData = canvas.toDataURL("image/jpeg");
 
-  Vibrant.from(base64ImageData).getPalette((error, palette) => {
+  await Vibrant.from(base64ImageData).getPalette((error, palette) => {
     console.log(`Error: ${error}, Palette: ${JSON.stringify(palette)}`);
   });
 }
