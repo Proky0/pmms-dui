@@ -192,7 +192,7 @@ function createAudioVisualization(player, visualization) {
   wave.fromElement(html5Player.id, waveCanvas.id, options);
 }
 
-function getAverageFrequencyValues(handle, media) {
+function getAverageFrequencyValues(media) {
   var context = new (window.AudioContext || window.webkitAudioContext)();
 
   var html5Player = media.youTubeApi
