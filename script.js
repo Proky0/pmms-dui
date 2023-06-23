@@ -192,9 +192,11 @@ function createAudioVisualization(player, visualization) {
   wave.fromElement(html5Player.id, waveCanvas.id, options);
 }
 
-function createAudioColor() {
+function createAudioColor(media) {
+  var video = media.youTubeApi
+    .getIframe()
+    .contentWindow.document.querySelector(".html5-main-video");
   var canvas = document.createElement("canvas");
-  var video = document.querySelector("video");
   var ctx = canvas.getContext("2d");
 
   // Change the size here
@@ -343,7 +345,7 @@ function initPlayer(id, handle, options) {
         }
 
         setInterval(() => {
-          createAudioColor();
+          createAudioColor(media);
         }, 5000);
       });
 
