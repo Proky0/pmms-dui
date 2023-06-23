@@ -192,7 +192,7 @@ function createAudioVisualization(player, visualization) {
   wave.fromElement(html5Player.id, waveCanvas.id, options);
 }
 
-async function createAudioColor() {
+function createAudioColor() {
   var canvas = document.createElement("canvas");
   var video = document.querySelector("video");
   var ctx = canvas.getContext("2d");
@@ -204,9 +204,14 @@ async function createAudioColor() {
 
   var base64ImageData = canvas.toDataURL("image/jpeg");
 
-  await Vibrant.from(base64ImageData).getPalette((error, palette) => {
+  var v = new Vibrant(base64ImageData);
+  v.getPalette((error, palette) => {
     console.log(`Error: ${error}, Palette: ${JSON.stringify(palette)}`);
   });
+
+  /*   Vibrant.from(base64ImageData).getPalette((error, palette) => {
+    console.log(`Error: ${error}, Palette: ${JSON.stringify(palette)}`);
+  }); */
 }
 
 function showLoadingIcon() {
