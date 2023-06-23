@@ -192,25 +192,8 @@ function createAudioVisualization(player, visualization) {
   wave.fromElement(html5Player.id, waveCanvas.id, options);
 }
 
-function getAverageFrequencyValues(player) {
+function getAverageFrequencyValues() {
   var context = new (window.AudioContext || window.webkitAudioContext)();
-
-  var source;
-
-  if (player.youTubeApi) {
-    var html5Player = player.youTubeApi
-      .getIframe()
-      .contentWindow.document.querySelector(".html5-main-video");
-
-    source = context.createMediaElementSource(html5Player);
-  } else if (player.hlsPlayer) {
-    source = context.createMediaElementSource(player.hlsPlayer.media);
-  } else if (player.originalNode) {
-    source = context.createMediaElementSource(player.originalNode);
-  } else {
-    source = context.createMediaElementSource(player);
-  }
-
   var analyser = context.createAnalyser();
 
   analyser.fftSize = 4096;
@@ -247,9 +230,6 @@ function getAverageFrequencyValues(player) {
   const frequencyData = new Uint8Array(analyser.frequencyBinCount);
 
   analyser.getByteFrequencyData(frequencyData);
-
-  source.connect(analyser);
-  analyser.connect(context.destination);
 
   const output = {};
 
