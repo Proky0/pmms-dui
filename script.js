@@ -195,49 +195,63 @@ function createAudioVisualization(player, visualization) {
 function getAverageFrequencyValues(player) {
   var context = new (window.AudioContext || window.webkitAudioContext)();
 
-  var audio = player.youTubeApi
-    .getIframe()
-    .contentDocument.getElementsByTagName("audio")[0];
+  var source;
 
-  var analyser = context.createAnalyser();
+  if (player.youTubeApi) {
+    var html5Player = player.youTubeApi
+      .getIframe()
+      .contentWindow.document.querySelector(".html5-main-video");
 
-  analyser.fftSize = 4096;
-  analyser.smoothingTimeConstant = 0.8;
+    source = context.createMediaElementSource(html5Player);
+  } else if (player.hlsPlayer) {
+    source = context.createMediaElementSource(player.hlsPlayer.media);
+  } else if (player.originalNode) {
+    source = context.createMediaElementSource(player.originalNode);
+  } else {
+    source = context.createMediaElementSource(player);
+  }
 
-  const types = {
-    bass: {
-      from: 20,
-      to: 140,
-    },
+  if (source) {
+    var analyser = context.createAnalyser();
 
-    lowMid: {
-      from: 140,
-      to: 400,
-    },
+    analyser.fftSize = 4096;
+    analyser.smoothingTimeConstant = 0.8;
 
-    mid: {
-      from: 400,
-      to: 2600,
-    },
+    const types = {
+      bass: {
+        from: 20,
+        to: 140,
+      },
 
-    highMid: {
-      from: 2600,
-      to: 5200,
-    },
+      lowMid: {
+        from: 140,
+        to: 400,
+      },
 
-    treble: {
-      from: 5200,
-      to: 14000,
-    },
-  };
+      mid: {
+        from: 400,
+        to: 2600,
+      },
 
-  const nyquistFrequency = context.sampleRate / 2;
-  const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+      highMid: {
+        from: 2600,
+        to: 5200,
+      },
 
-  analyser.getByteFrequencyData(frequencyData);
+      treble: {
+        from: 5200,
+        to: 14000,
+      },
+    };
 
-  audio.connect(analyser);
-  analyser.connect(context.destination); //playback audio
+    const nyquistFrequency = context.sampleRate / 2;
+    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+    analyser.getByteFrequencyData(frequencyData);
+
+    source.connect(analyser);
+    analyser.connect(context.destination); //playback audio
+  }
 
   const output = {};
 
