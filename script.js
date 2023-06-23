@@ -195,19 +195,20 @@ function createAudioVisualization(player, visualization) {
 function createAudioColor(media) {
   var video = media.youTubeApi
     .getIframe()
-    .contentWindow.document.querySelector(".html5-main-video");
+    .contentDocument.getElementsByTagName("video")[0];
   var canvas = document.createElement("canvas");
-  var ctx = canvas.getContext("2d");
 
-  // Change the size here
-  canvas.width = parseInt(video.offsetWidth);
-  canvas.height = parseInt(video.offsetHeight);
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  canvas.width = video.clientWidth;
+  canvas.height = video.clientHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  var base64ImageData = canvas.toDataURL("image/jpeg");
-  console.log(base64ImageData);
+  const image = new Image();
 
-  Vibrant.from("http://img.youtube.com/vi/b1p9104mMsM/maxresdefault.jpg")
+  image.width = canvas.width;
+  image.height = canvas.height;
+  image.src = canvas.toDataURL();
+
+  Vibrant.from(image)
     .quality(1)
     .clearFilters()
     .getPalette()
