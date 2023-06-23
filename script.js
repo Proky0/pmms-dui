@@ -198,9 +198,9 @@ function getAverageFrequencyValues(player) {
   var source;
 
   if (player.youTubeApi) {
-    var html5Player = player.youTubeApi
+    var html5Player = media.youTubeApi
       .getIframe()
-      .contentWindow.document.querySelector(".html5-main-video");
+      .contentDocument.getElementsByTagName("video")[0];
 
     source = context.createMediaElementSource(html5Player);
   } else if (player.hlsPlayer) {
@@ -244,14 +244,14 @@ function getAverageFrequencyValues(player) {
       },
     };
 
-    const nyquistFrequency = context.sampleRate / 2;
-    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
-
-    analyser.getByteFrequencyData(frequencyData);
-
     source.connect(analyser);
     analyser.connect(context.destination); //playback audio
   }
+
+  const nyquistFrequency = context.sampleRate / 2;
+  const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+  analyser.getByteFrequencyData(frequencyData);
 
   const output = {};
 
