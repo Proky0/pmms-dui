@@ -208,11 +208,13 @@ function createAudioColor(media) {
   image.height = canvas.height;
   image.src = canvas.toDataURL();
 
+  console.log(`SRC: ${image.src}`);
+
   Vibrant.from(image)
     .quality(1)
     .clearFilters()
     .getPalette()
-    .then((palette) => console.log(palette));
+    .then((palette) => console.log(JSON.stringify(palette)));
 }
 
 function showLoadingIcon() {
