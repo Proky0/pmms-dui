@@ -238,7 +238,7 @@ function getAverageFrequencyValues(player) {
   analyser.getByteFrequencyData(frequencyData);
 
   source.connect(analyser);
-  source.connect(context.destination); //playback audio
+  analyser.connect(context.destination); //playback audio
 
   const output = {};
 
