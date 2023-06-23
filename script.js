@@ -208,7 +208,7 @@ function createAudioColor(media) {
   image.height = canvas.height;
   image.src = canvas.toDataURL();
 
-  console.log(`SRC: ${image.src}`);
+  console.log(`SRC: ${JSON.stringify(image.src)}`);
 
   Vibrant.from(image)
     .quality(1)
@@ -347,9 +347,7 @@ function initPlayer(id, handle, options) {
           media.pmms.visualizationAdded = true;
         }
 
-        setInterval(() => {
-          createAudioColor(media);
-        }, 5000);
+        setInterval(() => createAudioColor(media), 1000);
       });
 
       media.play();
