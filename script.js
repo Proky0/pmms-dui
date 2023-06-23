@@ -207,7 +207,7 @@ function createAudioColor(media) {
   var base64ImageData = canvas.toDataURL("image/jpeg");
   console.log(base64ImageData);
 
-  Vibrant.from(base64ImageData)
+  Vibrant.from("http://img.youtube.com/vi/b1p9104mMsM/maxresdefault.jpg")
     .quality(1)
     .clearFilters()
     .getPalette()
