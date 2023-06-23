@@ -198,7 +198,7 @@ function getAverageFrequencyValues(player) {
   var source;
 
   if (player.youTubeApi) {
-    var html5Player = media.youTubeApi
+    var html5Player = player.youTubeApi
       .getIframe()
       .contentDocument.getElementsByTagName("video")[0];
 
