@@ -210,7 +210,7 @@ function createAudioColor(media) {
 
   console.log(`SRC: ${JSON.stringify(image.src)}`);
 
-  Vibrant.from(screenshot).getPalette((error, palette) => {
+  Vibrant.from(image).getPalette((error, palette) => {
     if (error) return;
 
     console.log(`Vibrant: ${palette.Vibrant.rgb}`);
