@@ -192,6 +192,23 @@ function createAudioVisualization(player, visualization) {
   wave.fromElement(html5Player.id, waveCanvas.id, options);
 }
 
+function createAudioColor() {
+  var canvas = document.createElement("canvas");
+  var video = document.querySelector("video");
+  var ctx = canvas.getContext("2d");
+
+  // Change the size here
+  canvas.width = parseInt(video.offsetWidth);
+  canvas.height = parseInt(video.offsetHeight);
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  var base64ImageData = canvas.toDataURL("image/jpeg");
+
+  Vibrant.from(base64ImageData).getPalette((error, palette) => {
+    console.log(`Error: ${error}, Palette: ${JSON.stringify(palette)}`);
+  });
+}
+
 function showLoadingIcon() {
   document.getElementById("loading").style.display = "block";
 }
@@ -321,6 +338,10 @@ function initPlayer(id, handle, options) {
           createAudioVisualization(media, options.visualization);
           media.pmms.visualizationAdded = true;
         }
+
+        setInterval(() => {
+          createAudioColor();
+        }, 5000);
       });
 
       media.play();
