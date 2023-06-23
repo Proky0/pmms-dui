@@ -192,6 +192,78 @@ function createAudioVisualization(player, visualization) {
   wave.fromElement(html5Player.id, waveCanvas.id, options);
 }
 
+function getAverageFrequencyValues(media) {
+  var context = new window.AudioContext();
+
+  var video = media.youTubeApi
+    .getIframe()
+    .contentDocument.getElementsByTagName("video")[0];
+
+  var source = context.createMediaElementSource(video);
+  var analyser = context.createAnalyser();
+
+  analyser.fftSize = 4096;
+  analyser.smoothingTimeConstant = 0.8;
+
+  source.connect(analyser);
+
+  const types = {
+    bass: {
+      from: 20,
+      to: 140,
+    },
+
+    lowMid: {
+      from: 140,
+      to: 400,
+    },
+
+    mid: {
+      from: 400,
+      to: 2600,
+    },
+
+    highMid: {
+      from: 2600,
+      to: 5200,
+    },
+
+    treble: {
+      from: 5200,
+      to: 14000,
+    },
+  };
+
+  const nyquistFrequency = context.sampleRate / 2;
+  const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+  analyser.getByteFrequencyData(frequencyData);
+
+  const output = {};
+
+  for (const key in types) {
+    const lowIndex = Math.round(
+      (types[key].from / nyquistFrequency) * frequencyData.length
+    );
+    const highIndex = Math.round(
+      (types[key].to / nyquistFrequency) * frequencyData.length
+    );
+
+    output[key] =
+      frequencyData
+        .slice(lowIndex, highIndex)
+        .reduce((total, number) => total + number, 0) /
+      (highIndex - lowIndex);
+  }
+
+  sendMessage("frequencyData", {
+    handle: handle,
+    levels: output,
+  });
+
+  return output;
+}
+
 function createAudioColor(media) {
   var video = media.youTubeApi
     .getIframe()
@@ -208,17 +280,20 @@ function createAudioColor(media) {
   image.height = canvas.height;
   image.src = canvas.toDataURL();
 
-  console.log(`SRC: ${JSON.stringify(image.src)}`);
-
   Vibrant.from(image.src).getPalette((error, palette) => {
     if (error) return;
 
-    console.log(`Vibrant: ${palette.Vibrant.rgb}`);
-    console.log(`DarkVibrant: ${palette.DarkVibrant.rgb}`);
-    console.log(`LightVibrant: ${palette.LightVibrant.rgb}`);
-    console.log(`Muted: ${palette.Muted.rgb}`);
-    console.log(`DarkMuted: ${palette.DarkMuted.rgb}`);
-    console.log(`LightMuted: ${palette.LightMuted.rgb}`);
+    sendMessage("colorData", {
+      handle: handle,
+      colors: {
+        Vibrant: palette.Vibrant.rgb,
+        DarkVibrant: palette.DarkVibrant.rgb,
+        LightVibrant: palette.LightVibrant.rgb,
+        Muted: palette.Muted.rgb,
+        DarkMuted: palette.DarkMuted.rgb,
+        LightMuted: palette.LightMuted.rgb,
+      },
+    });
   });
 }
 
@@ -352,7 +427,8 @@ function initPlayer(id, handle, options) {
           media.pmms.visualizationAdded = true;
         }
 
-        setInterval(() => createAudioColor(media), 1000);
+        setInterval(() => createAudioColor(media), 500);
+        setInterval(() => getAverageFrequencyValues(media), 50);
       });
 
       media.play();
