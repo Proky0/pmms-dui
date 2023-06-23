@@ -195,11 +195,22 @@ function createAudioVisualization(player, visualization) {
 function getAverageFrequencyValues(player) {
   var context = new (window.AudioContext || window.webkitAudioContext)();
 
-  var html5Player = player.youTubeApi
-    .getIframe()
-    .contentWindow.document.querySelector(".html5-main-video");
+  var source;
 
-  var source = context.createMediaElementSource(html5Player);
+  if (player.youTubeApi) {
+    var html5Player = player.youTubeApi
+      .getIframe()
+      .contentWindow.document.querySelector(".html5-main-video");
+
+    source = context.createMediaElementSource(html5Player);
+  } else if (player.hlsPlayer) {
+    source = context.createMediaElementSource(player.hlsPlayer.media);
+  } else if (player.originalNode) {
+    source = context.createMediaElementSource(player.originalNode);
+  } else {
+    source = context.createMediaElementSource(player);
+  }
+
   var analyser = context.createAnalyser();
 
   analyser.fftSize = 4096;
@@ -389,51 +400,51 @@ function initPlayer(id, handle, options) {
           createAudioVisualization(media, options.visualization);
           media.pmms.visualizationAdded = true;
         }
-
-        setInterval(() => {
-          sendMessage("frequencyData", {
-            handle: handle,
-            levels: getAverageFrequencyValues(media),
-          });
-        }, 50);
-
-        setInterval(() => {
-          var video = media.youTubeApi
-            .getIframe()
-            .contentDocument.getElementsByTagName("video")[0];
-          var canvas = document.createElement("canvas");
-
-          canvas.width = video.clientWidth;
-          canvas.height = video.clientHeight;
-          canvas
-            .getContext("2d")
-            .drawImage(video, 0, 0, canvas.width, canvas.height);
-
-          const image = new Image();
-
-          image.width = canvas.width;
-          image.height = canvas.height;
-          image.src = canvas.toDataURL();
-
-          Vibrant.from(image.src).getPalette((error, palette) => {
-            if (error) return;
-
-            sendMessage("colorData", {
-              handle: handle,
-              colors: {
-                Vibrant: palette.Vibrant.rgb,
-                DarkVibrant: palette.DarkVibrant.rgb,
-                LightVibrant: palette.LightVibrant.rgb,
-                Muted: palette.Muted.rgb,
-                DarkMuted: palette.DarkMuted.rgb,
-                LightMuted: palette.LightMuted.rgb,
-              },
-            });
-          });
-        }, 500);
       });
 
       media.play();
+
+      setInterval(() => {
+        sendMessage("frequencyData", {
+          handle: handle,
+          levels: getAverageFrequencyValues(media),
+        });
+      }, 50);
+
+      setInterval(() => {
+        var video = media.youTubeApi
+          .getIframe()
+          .contentDocument.getElementsByTagName("video")[0];
+        var canvas = document.createElement("canvas");
+
+        canvas.width = video.clientWidth;
+        canvas.height = video.clientHeight;
+        canvas
+          .getContext("2d")
+          .drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const image = new Image();
+
+        image.width = canvas.width;
+        image.height = canvas.height;
+        image.src = canvas.toDataURL();
+
+        Vibrant.from(image.src).getPalette((error, palette) => {
+          if (error) return;
+
+          sendMessage("colorData", {
+            handle: handle,
+            colors: {
+              Vibrant: palette.Vibrant.rgb,
+              DarkVibrant: palette.DarkVibrant.rgb,
+              LightVibrant: palette.LightVibrant.rgb,
+              Muted: palette.Muted.rgb,
+              DarkMuted: palette.DarkMuted.rgb,
+              LightMuted: palette.LightMuted.rgb,
+            },
+          });
+        });
+      }, 500);
     },
   });
 }
