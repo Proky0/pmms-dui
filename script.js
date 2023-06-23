@@ -195,7 +195,7 @@ function createAudioVisualization(player, visualization) {
 function getAverageFrequencyValues(player) {
   var context = new (window.AudioContext || window.webkitAudioContext)();
 
-  var audio = media.youTubeApi
+  var audio = player.youTubeApi
     .getIframe()
     .contentDocument.getElementsByTagName("audio")[0];
 
