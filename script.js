@@ -196,6 +196,34 @@ function getAverageFrequencyValues(player) {
   var context = new (window.AudioContext || window.webkitAudioContext)();
 
   var source;
+  var analyser;
+
+  const types = {
+    bass: {
+      from: 20,
+      to: 140,
+    },
+
+    lowMid: {
+      from: 140,
+      to: 400,
+    },
+
+    mid: {
+      from: 400,
+      to: 2600,
+    },
+
+    highMid: {
+      from: 2600,
+      to: 5200,
+    },
+
+    treble: {
+      from: 5200,
+      to: 14000,
+    },
+  };
 
   if (player.youTubeApi) {
     var html5Player = player.youTubeApi
@@ -212,37 +240,15 @@ function getAverageFrequencyValues(player) {
   }
 
   if (source) {
-    var analyser = context.createAnalyser();
+    analyser = context.createAnalyser();
 
     analyser.fftSize = 4096;
     analyser.smoothingTimeConstant = 0.8;
 
-    const types = {
-      bass: {
-        from: 20,
-        to: 140,
-      },
-
-      lowMid: {
-        from: 140,
-        to: 400,
-      },
-
-      mid: {
-        from: 400,
-        to: 2600,
-      },
-
-      highMid: {
-        from: 2600,
-        to: 5200,
-      },
-
-      treble: {
-        from: 5200,
-        to: 14000,
-      },
-    };
+    // Disconnect the AnalyserNode from the AudioDestinationNode if it is already connected.
+    if (analyser.connect) {
+      analyser.disconnect();
+    }
 
     source.connect(analyser);
     analyser.connect(context.destination); //playback audio
