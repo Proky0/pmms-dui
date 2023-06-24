@@ -192,7 +192,7 @@ function createAudioVisualization(player, visualization) {
   wave.fromElement(html5Player.id, waveCanvas.id, options);
 }
 
-function getAverageFrequencyValues() {
+function getAverageFrequencyValues(player) {
   var context = new window.AudioContext();
   var analyser = context.createAnalyser();
 
@@ -393,7 +393,7 @@ function initPlayer(id, handle, options) {
         setInterval(() => {
           sendMessage("frequencyData", {
             handle: handle,
-            levels: getAverageFrequencyValues(),
+            levels: getAverageFrequencyValues(media),
           });
         }, 50);
 
