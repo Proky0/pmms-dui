@@ -192,11 +192,12 @@ function createAudioVisualization(player, visualization) {
   wave.fromElement(html5Player.id, waveCanvas.id, options);
 }
 
-function getAverageFrequencyValues(player) {
-  var context = new (window.AudioContext || window.webkitAudioContext)();
+function getAverageFrequencyValues() {
+  var context = new window.AudioContext();
+  var analyser = context.createAnalyser();
 
-  var source;
-  var analyser;
+  analyser.fftSize = 4096;
+  analyser.smoothingTimeConstant = 0.8;
 
   const types = {
     bass: {
@@ -224,35 +225,6 @@ function getAverageFrequencyValues(player) {
       to: 14000,
     },
   };
-
-  if (player.youTubeApi) {
-    var html5Player = player.youTubeApi
-      .getIframe()
-      .contentDocument.getElementsByTagName("video")[0];
-
-    source = context.createMediaElementSource(html5Player);
-  } else if (player.hlsPlayer) {
-    source = context.createMediaElementSource(player.hlsPlayer.media);
-  } else if (player.originalNode) {
-    source = context.createMediaElementSource(player.originalNode);
-  } else {
-    source = context.createMediaElementSource(player);
-  }
-
-  if (source) {
-    analyser = context.createAnalyser();
-
-    analyser.fftSize = 4096;
-    analyser.smoothingTimeConstant = 0.8;
-
-    // Disconnect the AnalyserNode from the AudioDestinationNode if it is already connected.
-    if (analyser.connect) {
-      analyser.disconnect();
-    }
-
-    source.connect(analyser);
-    analyser.connect(context.destination); //playback audio
-  }
 
   const nyquistFrequency = context.sampleRate / 2;
   const frequencyData = new Uint8Array(analyser.frequencyBinCount);
@@ -412,7 +384,7 @@ function initPlayer(id, handle, options) {
         setInterval(() => {
           sendMessage("frequencyData", {
             handle: handle,
-            levels: getAverageFrequencyValues(media),
+            levels: getAverageFrequencyValues(),
           });
         }, 50);
 
