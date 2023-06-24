@@ -195,31 +195,34 @@ function createAudioVisualization(player, visualization) {
 function getAverageFrequencyValues(player) {
   const audioCtx = new AudioContext();
   const analyser = audioCtx.createAnalyser();
+  const source = audioCtx.createMediaElementSource(player);
 
-  const html5Player = player.youTubeApi
-    .getIframe()
-    .contentDocument.getElementsByTagName("video")[0];
-
-  const source = audioCtx.createMediaElementSource(html5Player);
   source.connect(analyser);
+  analyser.connect(audioCtx.destination);
 
-  analyser.fftSize = 4096;
-  analyser.smoothingTimeConstant = 0.8;
-
+  analyser.fftSize = 2048;
   const bufferLength = analyser.frequencyBinCount;
   const dataArray = new Uint8Array(bufferLength);
 
   analyser.getByteFrequencyData(dataArray);
 
-  const bassAvg = avg(dataArray.slice(20, 140));
-  const lowMidAvg = avg(dataArray.slice(140, 400));
-  const midAvg = avg(dataArray.slice(400, 2600));
-  const highMidAvg = avg(dataArray.slice(2600, 5200));
-  const trebleAvg = avg(dataArray.slice(5200, 14000));
+  const bassData = dataArray.slice(20, 140);
+  const lowMidData = dataArray.slice(140, 400);
+  const midData = dataArray.slice(400, 2600);
+  const highMidData = dataArray.slice(2600, 5200);
+  const trebleData = dataArray.slice(5200, 14000);
 
-  console.log(
-    `bassAvg: ${bassAvg}, lowMidAvg: ${lowMidAvg}, midAvg: ${midAvg}, highMidAvg: ${highMidAvg}, trebleAvg: ${trebleAvg}`
-  );
+  const bass = bassData.reduce((a, b) => a + b) / bassData.length;
+  const lowMid = lowMidData.reduce((a, b) => a + b) / lowMidData.length;
+  const mid = midData.reduce((a, b) => a + b) / midData.length;
+  const highMid = highMidData.reduce((a, b) => a + b) / highMidData.length;
+  const treble = trebleData.reduce((a, b) => a + b) / trebleData.length;
+
+  console.log(`The average frequency for bass is ${bass}`);
+  console.log(`The average frequency for lowMid is ${lowMid}`);
+  console.log(`The average frequency for mid is ${mid}`);
+  console.log(`The average frequency for highMid is ${highMid}`);
+  console.log(`The average frequency for treble is ${treble}`);
 
   return {};
 }
