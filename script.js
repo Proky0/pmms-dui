@@ -193,71 +193,35 @@ function createAudioVisualization(player, visualization) {
 }
 
 function getAverageFrequencyValues(player) {
-  var context = new window.AudioContext();
-  var analyser = context.createAnalyser();
+  const audioCtx = new AudioContext();
+  const analyser = audioCtx.createAnalyser();
 
-  var html5Player = player.youTubeApi
+  const html5Player = player.youTubeApi
     .getIframe()
-    .contentWindow.document.querySelector(".html5-main-video");
+    .contentDocument.getElementsByTagName("video")[0];
 
-  var source = context.createMediaElementSource(html5Player);
+  const source = audioCtx.createMediaElementSource(html5Player);
+  source.connect(analyser);
 
   analyser.fftSize = 4096;
   analyser.smoothingTimeConstant = 0.8;
 
-  source.connect(analyser);
-  source.connect(context.destination);
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
 
-  const types = {
-    bass: {
-      from: 20,
-      to: 140,
-    },
+  analyser.getByteFrequencyData(dataArray);
 
-    lowMid: {
-      from: 140,
-      to: 400,
-    },
+  const bassAvg = avg(dataArray.slice(20, 140));
+  const lowMidAvg = avg(dataArray.slice(140, 400));
+  const midAvg = avg(dataArray.slice(400, 2600));
+  const highMidAvg = avg(dataArray.slice(2600, 5200));
+  const trebleAvg = avg(dataArray.slice(5200, 14000));
 
-    mid: {
-      from: 400,
-      to: 2600,
-    },
+  console.log(
+    `bassAvg: ${bassAvg}, lowMidAvg: ${lowMidAvg}, midAvg: ${midAvg}, highMidAvg: ${highMidAvg}, trebleAvg: ${trebleAvg}`
+  );
 
-    highMid: {
-      from: 2600,
-      to: 5200,
-    },
-
-    treble: {
-      from: 5200,
-      to: 14000,
-    },
-  };
-
-  const nyquistFrequency = context.sampleRate / 2;
-  const frequencyData = new Uint8Array(analyser.frequencyBinCount);
-
-  analyser.getByteFrequencyData(frequencyData);
-
-  const output = {};
-
-  for (const key in types) {
-    const lowIndex = Math.round(
-      (types[key].from / nyquistFrequency) * frequencyData.length
-    );
-    const highIndex = Math.round(
-      (types[key].to / nyquistFrequency) * frequencyData.length
-    );
-
-    output[key] =
-      frequencyData
-        .slice(lowIndex, highIndex)
-        .reduce((total, number) => total + number, 0) /
-      (highIndex - lowIndex);
-  }
-
-  return output;
+  return {};
 }
 
 function showLoadingIcon() {
@@ -481,10 +445,6 @@ function init(data) {
   getPlayer(data.handle, data.options);
 }
 
-function play(handle) {
-  var player = getPlayer(handle);
-}
-
 function stop(handle) {
   var player = getPlayer(handle);
 
@@ -595,7 +555,7 @@ window.addEventListener("message", (event) => {
       init(event.data);
       break;
     case "play":
-      play(event.data.handle);
+      getPlayer(event.data.handle);
       break;
     case "stop":
       stop(event.data.handle);
