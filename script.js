@@ -196,8 +196,17 @@ function getAverageFrequencyValues() {
   var context = new window.AudioContext();
   var analyser = context.createAnalyser();
 
+  var html5Player = player.youTubeApi
+    .getIframe()
+    .contentWindow.document.querySelector(".html5-main-video");
+
+  var source = context.createMediaElementSource(html5Player);
+
   analyser.fftSize = 4096;
   analyser.smoothingTimeConstant = 0.8;
+
+  source.connect(analyser);
+  source.connect(context.destination);
 
   const types = {
     bass: {
