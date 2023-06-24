@@ -195,7 +195,11 @@ function createAudioVisualization(player, visualization) {
 function getAverageFrequencyValues(player) {
   const audioCtx = new AudioContext();
   const analyser = audioCtx.createAnalyser();
-  const source = audioCtx.createMediaElementSource(player);
+  const source = audioCtx.createMediaElementSource(
+    player.youTubeApi
+      .getIframe()
+      .contentWindow.document.getElementsByTagName("video")[0]
+  );
 
   source.connect(analyser);
   analyser.connect(audioCtx.destination);
