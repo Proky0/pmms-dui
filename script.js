@@ -322,7 +322,7 @@ function initPlayer(id, handle, options) {
           media.pmms.visualizationAdded = true;
         }
 
-        setInterval(() => createAudioColor(media), 500);
+        setInterval(() => createAudioColor(handle, media), 500);
         setInterval(() => getAverageFrequencyValues(media), 50);
       });
 
@@ -387,7 +387,7 @@ function stop(handle) {
   }
 }
 
-function createAudioColor(media) {
+function createAudioColor(handle, media) {
   var video = media.youTubeApi
     .getIframe()
     .contentDocument.getElementsByTagName("video")[0];
@@ -421,19 +421,23 @@ function createAudioColor(media) {
 }
 
 function getAverageFrequencyValues(media) {
-  var context = new window.AudioContext();
+  const context = new window.AudioContext();
 
-  var video = media.youTubeApi
+  const mediaElement = media.youTubeApi
     .getIframe()
     .contentDocument.getElementsByTagName("video")[0];
+  const sourceNode = mediaElement.srcObject;
 
-  var source = context.createMediaElementSource(video);
-  var analyser = context.createAnalyser();
+  // Disconnect the HTMLMediaElement object from the existing MediaElementSourceNode.
+  sourceNode.disconnect();
+
+  // Create a new MediaElementSourceNode for the HTMLMediaElement object.
+  const newSourceNode = context.createMediaElementSource(mediaElement);
 
   analyser.fftSize = 4096;
   analyser.smoothingTimeConstant = 0.8;
 
-  source.connect(analyser);
+  newSourceNode.connect(analyser);
 
   const types = {
     bass: {
