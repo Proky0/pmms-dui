@@ -421,37 +421,67 @@ function createAudioColor(handle, media) {
 }
 
 function getAverageFrequencyValues(media) {
-  var context = new window.AudioContext();
+  const config = {
+    bass: {
+      from: 20,
+      to: 140,
+    },
+
+    lowMid: {
+      from: 140,
+      to: 400,
+    },
+
+    mid: {
+      from: 400,
+      to: 2600,
+    },
+
+    highMid: {
+      from: 2600,
+      to: 5200,
+    },
+
+    treble: {
+      from: 5200,
+      to: 14000,
+    },
+  };
 
   const audioContext = new AudioContext();
   const source = audioContext.createMediaElementSource(
-    media.youTubeApi.getIframe().contentDocument.querySelector("video")
+    media.youTubeApi.getIframe().contentDocument.querySelector("audio")
   );
   const analyser = audioContext.createAnalyser();
 
-  analyser.fftSize = 512;
-  analyser.smoothingTimeConstant = 0.1;
+  if (source) {
+    source.connect(analyser);
 
-  source.connect(analyser);
+    analyser.fftSize = 2048;
 
-  analyser.onaudioprocess = function (e) {
-    // Get the frequency data from the analyzer
-    const frequencyData = e.frequencyData;
+    function getFrequencies(band) {
+      const frequencies = [];
+      for (let i = 0; i < analyser.frequencyBinCount; i++) {
+        const frequency = analyser.getFrequencyData()[i];
+        if (frequency > 0 && band.from <= frequency && frequency <= band.to) {
+          frequencies.push(frequency);
+        }
+      }
+      return frequencies;
+    }
 
-    // Calculate the average frequencies for each band
-    const bass = frequencyData.slice(0, 128).reduce((a, b) => a + b) / 128;
-    const lowMid = frequencyData.slice(128, 256).reduce((a, b) => a + b) / 128;
-    const mid = frequencyData.slice(256, 384).reduce((a, b) => a + b) / 128;
-    const highMid = frequencyData.slice(384, 512).reduce((a, b) => a + b) / 128;
-    const treble = frequencyData.slice(512, 512).reduce((a, b) => a + b) / 128;
+    const bassFrequencies = getFrequencies(config.bass);
+    const lowMidFrequencies = getFrequencies(config.lowMid);
+    const midFrequencies = getFrequencies(config.mid);
+    const highMidFrequencies = getFrequencies(config.highMid);
+    const trebleFrequencies = getFrequencies(config.treble);
 
-    // Display the frequency data in the console
-    console.log("Bass: " + bass);
-    console.log("Low Mid: " + lowMid);
-    console.log("Mid: " + mid);
-    console.log("High Mid: " + highMid);
-    console.log("Treble: " + treble);
-  };
+    console.log(bassFrequencies);
+    console.log(lowMidFrequencies);
+    console.log(midFrequencies);
+    console.log(highMidFrequencies);
+    console.log(trebleFrequencies);
+  }
 
   sendMessage("frequencyData", {
     handle: handle,
