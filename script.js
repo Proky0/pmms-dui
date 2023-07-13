@@ -420,7 +420,7 @@ function createAudioColor(handle, media) {
   });
 }
 
-function getAverageFrequencyValues() {
+function getAverageFrequencyValues(media) {
   const types = {
     bass: {
       from: 20,
@@ -451,7 +451,7 @@ function getAverageFrequencyValues() {
   const context = new (window.AudioContext || window.webkitAudioContext)();
   const analyser = context.createAnalyser();
 
-  const html5Player = player.youTubeApi
+  const html5Player = media.youTubeApi
     .getIframe()
     .contentWindow.document.querySelector(".html5-main-video");
 
