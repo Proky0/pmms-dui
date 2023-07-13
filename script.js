@@ -420,8 +420,8 @@ function createAudioColor(handle, media) {
   });
 }
 
-function getAverageFrequencyValues(media) {
-  const config = {
+function getAverageFrequencyValues() {
+  const types = {
     bass: {
       from: 20,
       to: 140,
@@ -448,41 +448,38 @@ function getAverageFrequencyValues(media) {
     },
   };
 
-  const audioContext = new AudioContext();
-  const source = audioContext.createMediaElementSource(
-    media.youTubeApi
-      .getIframe()
-      .contentDocument.getElementsByTagName("video")[0]
-  );
-  const analyser = audioContext.createAnalyser();
+  const context = new (window.AudioContext || window.webkitAudioContext)();
+  const analyser = context.createAnalyser();
 
-  if (source) {
-    source.connect(analyser);
+  const html5Player = player.youTubeApi
+    .getIframe()
+    .contentWindow.document.querySelector(".html5-main-video");
 
-    analyser.fftSize = 2048;
+  const source = context.createMediaElementSource(html5Player);
 
-    function getFrequencies(band) {
-      const frequencies = [];
-      for (let i = 0; i < analyser.frequencyBinCount; i++) {
-        const frequency = analyser.getFrequencyData()[i];
-        if (frequency > 0 && band.from <= frequency && frequency <= band.to) {
-          frequencies.push(frequency);
-        }
-      }
-      return frequencies;
-    }
+  const nyquistFrequency = context.sampleRate / 2;
+  const frequencyData = new Uint8Array(analyser.frequencyBinCount);
 
-    const bassFrequencies = getFrequencies(config.bass);
-    const lowMidFrequencies = getFrequencies(config.lowMid);
-    const midFrequencies = getFrequencies(config.mid);
-    const highMidFrequencies = getFrequencies(config.highMid);
-    const trebleFrequencies = getFrequencies(config.treble);
+  analyser.getByteFrequencyData(frequencyData);
 
-    console.log(bassFrequencies);
-    console.log(lowMidFrequencies);
-    console.log(midFrequencies);
-    console.log(highMidFrequencies);
-    console.log(trebleFrequencies);
+  source.connect(analyser);
+  source.connect(context.destination); //playback audio
+
+  const output = {};
+
+  for (const key in types) {
+    const lowIndex = Math.round(
+      (types[key].from / nyquistFrequency) * frequencyData.length
+    );
+    const highIndex = Math.round(
+      (types[key].to / nyquistFrequency) * frequencyData.length
+    );
+
+    output[key] =
+      frequencyData
+        .slice(lowIndex, highIndex)
+        .reduce((total, number) => total + number, 0) /
+      (highIndex - lowIndex);
   }
 
   sendMessage("frequencyData", {
