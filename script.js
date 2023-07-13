@@ -450,7 +450,9 @@ function getAverageFrequencyValues(media) {
 
   const audioContext = new AudioContext();
   const source = audioContext.createMediaElementSource(
-    media.youTubeApi.getIframe().contentDocument.querySelector("audio")
+    media.youTubeApi
+      .getIframe()
+      .contentDocument.getElementsByTagName("video")[0]
   );
   const analyser = audioContext.createAnalyser();
 
