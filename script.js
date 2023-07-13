@@ -192,45 +192,6 @@ function createAudioVisualization(player, visualization) {
   wave.fromElement(html5Player.id, waveCanvas.id, options);
 }
 
-function getAverageFrequencyValues(player) {
-  const audioCtx = new AudioContext();
-  const analyser = audioCtx.createAnalyser();
-  const source = audioCtx.createMediaElementSource(
-    player.youTubeApi
-      .getIframe()
-      .contentWindow.document.getElementsByTagName("video")[0]
-  );
-
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-
-  analyser.fftSize = 2048;
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-
-  analyser.getByteFrequencyData(dataArray);
-
-  const bassData = dataArray.slice(20, 140);
-  const lowMidData = dataArray.slice(140, 400);
-  const midData = dataArray.slice(400, 2600);
-  const highMidData = dataArray.slice(2600, 5200);
-  const trebleData = dataArray.slice(5200, 14000);
-
-  const bass = bassData.reduce((a, b) => a + b) / bassData.length;
-  const lowMid = lowMidData.reduce((a, b) => a + b) / lowMidData.length;
-  const mid = midData.reduce((a, b) => a + b) / midData.length;
-  const highMid = highMidData.reduce((a, b) => a + b) / highMidData.length;
-  const treble = trebleData.reduce((a, b) => a + b) / trebleData.length;
-
-  console.log(`The average frequency for bass is ${bass}`);
-  console.log(`The average frequency for lowMid is ${lowMid}`);
-  console.log(`The average frequency for mid is ${mid}`);
-  console.log(`The average frequency for highMid is ${highMid}`);
-  console.log(`The average frequency for treble is ${treble}`);
-
-  return {};
-}
-
 function showLoadingIcon() {
   document.getElementById("loading").style.display = "block";
 }
@@ -361,47 +322,8 @@ function initPlayer(id, handle, options) {
           media.pmms.visualizationAdded = true;
         }
 
-        setInterval(() => {
-          sendMessage("frequencyData", {
-            handle: handle,
-            levels: getAverageFrequencyValues(media),
-          });
-        }, 50);
-
-        setInterval(() => {
-          var video = media.youTubeApi
-            .getIframe()
-            .contentDocument.getElementsByTagName("video")[0];
-          var canvas = document.createElement("canvas");
-
-          canvas.width = video.clientWidth;
-          canvas.height = video.clientHeight;
-          canvas
-            .getContext("2d")
-            .drawImage(video, 0, 0, canvas.width, canvas.height);
-
-          const image = new Image();
-
-          image.width = canvas.width;
-          image.height = canvas.height;
-          image.src = canvas.toDataURL();
-
-          Vibrant.from(image.src).getPalette((error, palette) => {
-            if (error) return;
-
-            sendMessage("colorData", {
-              handle: handle,
-              colors: {
-                Vibrant: palette.Vibrant.rgb,
-                DarkVibrant: palette.DarkVibrant.rgb,
-                LightVibrant: palette.LightVibrant.rgb,
-                Muted: palette.Muted.rgb,
-                DarkMuted: palette.DarkMuted.rgb,
-                LightMuted: palette.LightMuted.rgb,
-              },
-            });
-          });
-        }, 500);
+        setInterval(() => createAudioColor(media), 500);
+        setInterval(() => getAverageFrequencyValues(media), 50);
       });
 
       media.play();
@@ -463,6 +385,111 @@ function stop(handle) {
 
     player.remove();
   }
+}
+
+function createAudioColor(media) {
+  var video = media.youTubeApi
+    .getIframe()
+    .contentDocument.getElementsByTagName("video")[0];
+  var canvas = document.createElement("canvas");
+
+  canvas.width = video.clientWidth;
+  canvas.height = video.clientHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const image = new Image();
+
+  image.width = canvas.width;
+  image.height = canvas.height;
+  image.src = canvas.toDataURL();
+
+  Vibrant.from(image.src).getPalette((error, palette) => {
+    if (error) return;
+
+    sendMessage("colorData", {
+      handle: handle,
+      colors: {
+        Vibrant: palette.Vibrant.rgb,
+        DarkVibrant: palette.DarkVibrant.rgb,
+        LightVibrant: palette.LightVibrant.rgb,
+        Muted: palette.Muted.rgb,
+        DarkMuted: palette.DarkMuted.rgb,
+        LightMuted: palette.LightMuted.rgb,
+      },
+    });
+  });
+}
+
+function getAverageFrequencyValues(media) {
+  var context = new window.AudioContext();
+
+  var video = media.youTubeApi
+    .getIframe()
+    .contentDocument.getElementsByTagName("video")[0];
+
+  var source = context.createMediaElementSource(video);
+  var analyser = context.createAnalyser();
+
+  analyser.fftSize = 4096;
+  analyser.smoothingTimeConstant = 0.8;
+
+  source.connect(analyser);
+
+  const types = {
+    bass: {
+      from: 20,
+      to: 140,
+    },
+
+    lowMid: {
+      from: 140,
+      to: 400,
+    },
+
+    mid: {
+      from: 400,
+      to: 2600,
+    },
+
+    highMid: {
+      from: 2600,
+      to: 5200,
+    },
+
+    treble: {
+      from: 5200,
+      to: 14000,
+    },
+  };
+
+  const nyquistFrequency = context.sampleRate / 2;
+  const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+  analyser.getByteFrequencyData(frequencyData);
+
+  const output = {};
+
+  for (const key in types) {
+    const lowIndex = Math.round(
+      (types[key].from / nyquistFrequency) * frequencyData.length
+    );
+    const highIndex = Math.round(
+      (types[key].to / nyquistFrequency) * frequencyData.length
+    );
+
+    output[key] =
+      frequencyData
+        .slice(lowIndex, highIndex)
+        .reduce((total, number) => total + number, 0) /
+      (highIndex - lowIndex);
+  }
+
+  sendMessage("frequencyData", {
+    handle: handle,
+    levels: output,
+  });
+
+  return output;
 }
 
 function setAttenuationFactor(player, target) {
