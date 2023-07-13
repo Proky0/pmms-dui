@@ -451,11 +451,11 @@ function getAverageFrequencyValues(media) {
   const context = new (window.AudioContext || window.webkitAudioContext)();
   const analyser = context.createAnalyser();
 
-  const html5Player = media.youTubeApi
+  const videoElement = media.youTubeApi
     .getIframe()
-    .contentWindow.document.querySelector(".html5-main-video");
+    .contentWindow.document.querySelector(".ytd-video-player");
 
-  const source = context.createMediaElementSource(html5Player);
+  const source = context.createMediaElementSource(videoElement);
 
   const nyquistFrequency = context.sampleRate / 2;
   const frequencyData = new Uint8Array(analyser.frequencyBinCount);
