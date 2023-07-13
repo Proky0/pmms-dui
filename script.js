@@ -421,72 +421,37 @@ function createAudioColor(handle, media) {
 }
 
 function getAverageFrequencyValues(media) {
-  const context = new window.AudioContext();
+  var context = new window.AudioContext();
 
-  const mediaElement = media.youTubeApi
-    .getIframe()
-    .contentDocument.getElementsByTagName("video")[0];
-  const sourceNode = mediaElement.srcObject;
+  const audioContext = new AudioContext();
+  const source = audioContext.createMediaElementSource(
+    media.youTubeApi.getIframe().contentDocument.querySelector("video")
+  );
+  const analyser = audioContext.createAnalyser();
 
-  // Disconnect the HTMLMediaElement object from the existing MediaElementSourceNode.
-  sourceNode.disconnect();
+  analyser.fftSize = 512;
+  analyser.smoothingTimeConstant = 0.1;
 
-  // Create a new MediaElementSourceNode for the HTMLMediaElement object.
-  const newSourceNode = context.createMediaElementSource(mediaElement);
+  source.connect(analyser);
 
-  analyser.fftSize = 4096;
-  analyser.smoothingTimeConstant = 0.8;
+  analyser.onaudioprocess = function (e) {
+    // Get the frequency data from the analyzer
+    const frequencyData = e.frequencyData;
 
-  newSourceNode.connect(analyser);
+    // Calculate the average frequencies for each band
+    const bass = frequencyData.slice(0, 128).reduce((a, b) => a + b) / 128;
+    const lowMid = frequencyData.slice(128, 256).reduce((a, b) => a + b) / 128;
+    const mid = frequencyData.slice(256, 384).reduce((a, b) => a + b) / 128;
+    const highMid = frequencyData.slice(384, 512).reduce((a, b) => a + b) / 128;
+    const treble = frequencyData.slice(512, 512).reduce((a, b) => a + b) / 128;
 
-  const types = {
-    bass: {
-      from: 20,
-      to: 140,
-    },
-
-    lowMid: {
-      from: 140,
-      to: 400,
-    },
-
-    mid: {
-      from: 400,
-      to: 2600,
-    },
-
-    highMid: {
-      from: 2600,
-      to: 5200,
-    },
-
-    treble: {
-      from: 5200,
-      to: 14000,
-    },
+    // Display the frequency data in the console
+    console.log("Bass: " + bass);
+    console.log("Low Mid: " + lowMid);
+    console.log("Mid: " + mid);
+    console.log("High Mid: " + highMid);
+    console.log("Treble: " + treble);
   };
-
-  const nyquistFrequency = context.sampleRate / 2;
-  const frequencyData = new Uint8Array(analyser.frequencyBinCount);
-
-  analyser.getByteFrequencyData(frequencyData);
-
-  const output = {};
-
-  for (const key in types) {
-    const lowIndex = Math.round(
-      (types[key].from / nyquistFrequency) * frequencyData.length
-    );
-    const highIndex = Math.round(
-      (types[key].to / nyquistFrequency) * frequencyData.length
-    );
-
-    output[key] =
-      frequencyData
-        .slice(lowIndex, highIndex)
-        .reduce((total, number) => total + number, 0) /
-      (highIndex - lowIndex);
-  }
 
   sendMessage("frequencyData", {
     handle: handle,
