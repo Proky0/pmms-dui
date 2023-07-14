@@ -421,73 +421,27 @@ function createAudioColor(handle, media) {
 }
 
 function getAverageFrequencyValues(media) {
-  const types = {
-    bass: {
-      from: 20,
-      to: 140,
-    },
-
-    lowMid: {
-      from: 140,
-      to: 400,
-    },
-
-    mid: {
-      from: 400,
-      to: 2600,
-    },
-
-    highMid: {
-      from: 2600,
-      to: 5200,
-    },
-
-    treble: {
-      from: 5200,
-      to: 14000,
-    },
-  };
-
-  const context = new (window.AudioContext || window.webkitAudioContext)();
-  const analyser = context.createAnalyser();
-
+  const audioContext = new AudioContext();
   const videoElement = media.youTubeApi
     .getIframe()
     .contentWindow.document.querySelector(".ytd-video-player");
 
-  const source = context.createMediaElementSource(videoElement);
+  const mediaElementSource =
+    audioContext.createMediaElementSource(videoElement);
+  const analyser = audioContext.createAnalyser();
 
-  const nyquistFrequency = context.sampleRate / 2;
-  const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+  mediaElementSource.connect(analyser);
 
-  analyser.getByteFrequencyData(frequencyData);
-
-  source.connect(analyser);
-  source.connect(context.destination); //playback audio
-
-  const output = {};
-
-  for (const key in types) {
-    const lowIndex = Math.round(
-      (types[key].from / nyquistFrequency) * frequencyData.length
-    );
-    const highIndex = Math.round(
-      (types[key].to / nyquistFrequency) * frequencyData.length
-    );
-
-    output[key] =
-      frequencyData
-        .slice(lowIndex, highIndex)
-        .reduce((total, number) => total + number, 0) /
-      (highIndex - lowIndex);
-  }
+  analyser.getFrequencyData((frequencyData) => {
+    console.log(frequencyData);
+  });
 
   sendMessage("frequencyData", {
     handle: handle,
-    levels: output,
+    levels: {},
   });
 
-  return output;
+  return {};
 }
 
 function setAttenuationFactor(player, target) {
