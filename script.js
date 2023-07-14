@@ -424,7 +424,7 @@ function getAverageFrequencyValues(media) {
   const audioContext = new AudioContext();
   const videoElement = media.youTubeApi
     .getIframe()
-    .contentWindow.document.querySelector(".ytd-video-player");
+    .contentDocument.querySelector(".ytd-video-player");
 
   const mediaElementSource =
     audioContext.createMediaElementSource(videoElement);
