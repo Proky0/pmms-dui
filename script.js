@@ -323,7 +323,10 @@ function initPlayer(id, handle, options) {
         }
 
         setInterval(() => createAudioColor(handle, media), 500);
-        setInterval(() => getAverageFrequencyValues(media), 50);
+      });
+
+      media.addEventListener("ended", () => {
+        sendMessage("ended", { handle: handle });
       });
 
       media.play();
@@ -418,30 +421,6 @@ function createAudioColor(handle, media) {
       },
     });
   });
-}
-
-function getAverageFrequencyValues(media) {
-  const audioContext = new AudioContext();
-  const videoElement = media.youTubeApi
-    .getIframe()
-    .contentDocument.querySelector(".ytd-video-player");
-
-  const mediaElementSource =
-    audioContext.createMediaElementSource(videoElement);
-  const analyser = audioContext.createAnalyser();
-
-  mediaElementSource.connect(analyser);
-
-  analyser.getFrequencyData((frequencyData) => {
-    console.log(frequencyData);
-  });
-
-  sendMessage("frequencyData", {
-    handle: handle,
-    levels: {},
-  });
-
-  return {};
 }
 
 function setAttenuationFactor(player, target) {
