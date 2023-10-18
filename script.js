@@ -109,6 +109,7 @@ function applyRadioFilter(player) {
   if (source) {
     var splitter = context.createChannelSplitter(2);
     var merger = context.createChannelMerger(2);
+    var analyzerNode = context.createAnalyser();
 
     var gainNode = context.createGain();
     gainNode.gain.value = 0.5;
@@ -123,16 +124,8 @@ function applyRadioFilter(player) {
     highpass.frequency.value = 200;
     highpass.gain.value = -1;
 
-    const analyserNode = context.createAnalyser();
-
+    source.connect(analyzerNode);
     source.connect(splitter);
-    source.connect(analyserNode);
-
-    const frequencyData = new Float32Array(analyserNode.frequencyBinCount);
-    analyserNode.getFloatFrequencyData(frequencyData);
-
-    console.log(`FrequencyData: ${frequencyData}`);
-
     splitter.connect(merger, 0, 0);
     splitter.connect(merger, 1, 0);
     splitter.connect(merger, 0, 1);
@@ -141,6 +134,19 @@ function applyRadioFilter(player) {
     gainNode.connect(lowpass);
     lowpass.connect(highpass);
     highpass.connect(context.destination);
+    analyzerNode.connect(context.destination);
+
+    // Get the frequency data using the getByteFrequencyData() method.
+    const frequencyData = new Uint8Array(analyzerNode.frequencyBinCount);
+
+    // Calculate the bass frequency, medium frequency, and high frequency using the frequency data.
+    const bassFrequency = frequencyData[0];
+    const mediumFrequency = frequencyData[frequencyData.length / 2];
+    const highFrequency = frequencyData[frequencyData.length - 1];
+
+    console.log(`Bass frequency: ${bassFrequency}`);
+    console.log(`Medium frequency: ${mediumFrequency}`);
+    console.log(`High frequency: ${highFrequency}`);
   }
 }
 
