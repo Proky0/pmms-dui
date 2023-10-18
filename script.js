@@ -448,21 +448,23 @@ function createAudioColor(handle, media) {
   image.height = canvas.height;
   image.src = canvas.toDataURL();
 
-  Vibrant.from(image.src).getPalette((error, palette) => {
-    if (error) return;
-
-    sendMessage("colorData", {
-      handle: handle,
-      colors: {
-        Vibrant: palette.Vibrant.rgb,
-        DarkVibrant: palette.DarkVibrant.rgb,
-        LightVibrant: palette.LightVibrant.rgb,
-        Muted: palette.Muted.rgb,
-        DarkMuted: palette.DarkMuted.rgb,
-        LightMuted: palette.LightMuted.rgb,
-      },
+  Vibrant.from(image.src)
+    .quality(10)
+    .maxDimension(10)
+    .getPalette()
+    .then((palette) => {
+      sendMessage("colorData", {
+        handle: handle,
+        colors: {
+          Vibrant: palette.Vibrant.rgb,
+          DarkVibrant: palette.DarkVibrant.rgb,
+          LightVibrant: palette.LightVibrant.rgb,
+          Muted: palette.Muted.rgb,
+          DarkMuted: palette.DarkMuted.rgb,
+          LightMuted: palette.LightMuted.rgb,
+        },
+      });
     });
-  });
 }
 
 function setAttenuationFactor(player, target) {
