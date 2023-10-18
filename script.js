@@ -323,7 +323,7 @@ function initPlayer(id, handle, options) {
         }
 
         setInterval(() => createAudioColor(handle, media), 500);
-        setInterval(() => getAudioFrequency(handle, media), 500);
+        setInterval(() => getAudioFrequency(media), 500);
       });
 
       media.addEventListener("ended", () => {
