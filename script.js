@@ -136,17 +136,19 @@ function applyRadioFilter(player) {
     highpass.connect(context.destination);
     analyzerNode.connect(context.destination);
 
-    // Get the frequency data using the getByteFrequencyData() method.
-    const frequencyData = new Uint8Array(analyzerNode.frequencyBinCount);
+    setInterval(() => {
+      // Get the frequency data using the getByteFrequencyData() method.
+      const frequencyData = new Uint8Array(analyzerNode.frequencyBinCount);
 
-    // Calculate the bass frequency, medium frequency, and high frequency using the frequency data.
-    const bassFrequency = frequencyData[0];
-    const mediumFrequency = frequencyData[frequencyData.length / 2];
-    const highFrequency = frequencyData[frequencyData.length - 1];
+      // Calculate the bass frequency, medium frequency, and high frequency using the frequency data.
+      const bassFrequency = frequencyData[0];
+      const mediumFrequency = frequencyData[frequencyData.length / 2];
+      const highFrequency = frequencyData[frequencyData.length - 1];
 
-    console.log(`Bass frequency: ${bassFrequency}`);
-    console.log(`Medium frequency: ${mediumFrequency}`);
-    console.log(`High frequency: ${highFrequency}`);
+      console.log(`Bass frequency: ${bassFrequency}`);
+      console.log(`Medium frequency: ${mediumFrequency}`);
+      console.log(`High frequency: ${highFrequency}`);
+    }, 1000);
   }
 }
 
