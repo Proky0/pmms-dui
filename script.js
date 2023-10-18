@@ -308,6 +308,9 @@ function initPlayer(id, handle, options) {
       });
 
       media.addEventListener("playing", () => {
+        setInterval(() => createAudioColor(handle, media), 500);
+        setInterval(() => getAudioFrequency(media), 500);
+
         if (options.filter && !media.pmms.filterAdded) {
           if (isRDR) {
             applyPhonographFilter(media);
@@ -321,9 +324,6 @@ function initPlayer(id, handle, options) {
           createAudioVisualization(media, options.visualization);
           media.pmms.visualizationAdded = true;
         }
-
-        setInterval(() => createAudioColor(handle, media), 500);
-        setInterval(() => getAudioFrequency(media), 500);
       });
 
       media.addEventListener("ended", () => {
