@@ -104,6 +104,8 @@ function applyRadioFilter(player) {
     source = context.createMediaElementSource(player);
   }
 
+  print("Radio Filter Apply !");
+
   if (source) {
     var splitter = context.createChannelSplitter(2);
     var merger = context.createChannelMerger(2);
@@ -130,6 +132,14 @@ function applyRadioFilter(player) {
     gainNode.connect(lowpass);
     lowpass.connect(highpass);
     highpass.connect(context.destination);
+
+    const analyserNode = context.createAnalyser();
+    const frequencyData = new Float32Array(analyserNode.frequencyBinCount);
+
+    analyserNode.start();
+    analyserNode.getFloatFrequencyData(frequencyData);
+
+    console.log(frequencyData);
   }
 }
 
