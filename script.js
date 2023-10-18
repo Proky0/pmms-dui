@@ -104,12 +104,9 @@ function applyRadioFilter(player) {
     source = context.createMediaElementSource(player);
   }
 
-  console.log("Radio Filter Apply !");
-
   if (source) {
     var splitter = context.createChannelSplitter(2);
     var merger = context.createChannelMerger(2);
-    var analyzerNode = context.createAnalyser();
 
     var gainNode = context.createGain();
     gainNode.gain.value = 0.5;
@@ -124,7 +121,6 @@ function applyRadioFilter(player) {
     highpass.frequency.value = 200;
     highpass.gain.value = -1;
 
-    source.connect(analyzerNode);
     source.connect(splitter);
     splitter.connect(merger, 0, 0);
     splitter.connect(merger, 1, 0);
@@ -134,21 +130,6 @@ function applyRadioFilter(player) {
     gainNode.connect(lowpass);
     lowpass.connect(highpass);
     highpass.connect(context.destination);
-    analyzerNode.connect(context.destination);
-
-    setInterval(() => {
-      // Get the frequency data using the getByteFrequencyData() method.
-      const frequencyData = new Uint8Array(analyzerNode.frequencyBinCount);
-
-      // Calculate the bass frequency, medium frequency, and high frequency using the frequency data.
-      const bassFrequency = frequencyData[0];
-      const mediumFrequency = frequencyData[frequencyData.length / 2];
-      const highFrequency = frequencyData[frequencyData.length - 1];
-
-      console.log(`Bass frequency: ${bassFrequency}`);
-      console.log(`Medium frequency: ${mediumFrequency}`);
-      console.log(`High frequency: ${highFrequency}`);
-    }, 1000);
   }
 }
 
@@ -342,6 +323,7 @@ function initPlayer(id, handle, options) {
         }
 
         setInterval(() => createAudioColor(handle, media), 500);
+        setInterval(() => getAudioFrequency(handle, media), 500);
       });
 
       media.addEventListener("ended", () => {
@@ -406,6 +388,47 @@ function stop(handle) {
     }
 
     player.remove();
+  }
+}
+
+function getAudioFrequency(player) {
+  var context = new (window.AudioContext || window.webkitAudioContext)();
+
+  var source;
+
+  if (player.youTubeApi) {
+    var html5Player = player.youTubeApi
+      .getIframe()
+      .contentWindow.document.querySelector(".html5-main-video");
+
+    source = context.createMediaElementSource(html5Player);
+  } else if (player.hlsPlayer) {
+    source = context.createMediaElementSource(player.hlsPlayer.media);
+  } else if (player.originalNode) {
+    source = context.createMediaElementSource(player.originalNode);
+  } else {
+    source = context.createMediaElementSource(player);
+  }
+
+  if (source) {
+    console.log(`Found the source.`);
+
+    var analyzerNode = context.createAnalyser();
+
+    source.connect(analyzerNode);
+    analyzerNode.connect(context.destination);
+
+    const frequencyData = new Uint8Array(analyzerNode.frequencyBinCount);
+
+    console.log(frequencyData);
+
+    const bassFrequency = frequencyData[0];
+    const mediumFrequency = frequencyData[frequencyData.length / 2];
+    const highFrequency = frequencyData[frequencyData.length - 1];
+
+    console.log(`Bass frequency: ${bassFrequency}`);
+    console.log(`Medium frequency: ${mediumFrequency}`);
+    console.log(`High frequency: ${highFrequency}`);
   }
 }
 
