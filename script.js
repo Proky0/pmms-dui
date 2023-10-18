@@ -123,7 +123,16 @@ function applyRadioFilter(player) {
     highpass.frequency.value = 200;
     highpass.gain.value = -1;
 
+    const analyserNode = context.createAnalyser();
+
     source.connect(splitter);
+    source.connect(analyserNode);
+
+    const frequencyData = new Float32Array(analyserNode.frequencyBinCount);
+    analyserNode.getFloatFrequencyData(frequencyData);
+
+    console.log(`FrequencyData: ${frequencyData}`);
+
     splitter.connect(merger, 0, 0);
     splitter.connect(merger, 1, 0);
     splitter.connect(merger, 0, 1);
@@ -132,14 +141,6 @@ function applyRadioFilter(player) {
     gainNode.connect(lowpass);
     lowpass.connect(highpass);
     highpass.connect(context.destination);
-
-    const analyserNode = context.createAnalyser();
-    const frequencyData = new Float32Array(analyserNode.frequencyBinCount);
-
-    analyserNode.start();
-    analyserNode.getFloatFrequencyData(frequencyData);
-
-    console.log(frequencyData);
   }
 }
 
