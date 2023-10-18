@@ -104,7 +104,7 @@ function applyRadioFilter(player) {
     source = context.createMediaElementSource(player);
   }
 
-  print("Radio Filter Apply !");
+  console.log("Radio Filter Apply !");
 
   if (source) {
     var splitter = context.createChannelSplitter(2);
