@@ -277,13 +277,14 @@ function initPlayer(id, handle, options) {
         if (media.youTubeApi) {
           options.title = media.youTubeApi.getVideoData().title;
 
+          const buttonTest = media.youTubeApi.getIframe().contentWindow.document.querySelector("[id^='skip-button'] button, [class='ytp-skip-ad-button']")
           const skipButton = media.youTubeApi.getIframe().contentWindow.document.querySelector(`
-            .ytp-skip-ad-button,
-            .ytp-ad-skip-button,
-            .ytp-ad-skip-button-modern
-        `)
+            button.ytp-skip-ad-button,
+            button.ytp-ad-skip-button-modern
+          `)
 
           console.log(`Skip Button: ${skipButton}`)
+          console.log(`Button Test: ${buttonTest}`)
           /* 
             let clickbutton = setInterval(() => {
               if (skipButton) {
