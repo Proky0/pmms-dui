@@ -311,15 +311,6 @@ function initPlayer(id, handle, options) {
         setInterval(() => createAudioColor(handle, media), 500);
         setInterval(() => getAudioFrequency(media), 500);
 
-        if (options.filter && !media.pmms.filterAdded) {
-          if (isRDR) {
-            applyPhonographFilter(media);
-          } else {
-            applyRadioFilter(media);
-          }
-          media.pmms.filterAdded = true;
-        }
-
         if (options.visualization && !media.pmms.visualizationAdded) {
           createAudioVisualization(media, options.visualization);
           media.pmms.visualizationAdded = true;
@@ -392,34 +383,36 @@ function stop(handle) {
 }
 
 function getAudioFrequency(player) {
-  var context = new (window.AudioContext || window.webkitAudioContext)();
-
-  var source;
-
-  if (player.youTubeApi) {
-    var html5Player = player.youTubeApi
-      .getIframe()
-      .contentWindow.document.querySelector(".html5-main-video");
-
-    source = context.createMediaElementSource(html5Player);
-  } else if (player.hlsPlayer) {
-    source = context.createMediaElementSource(player.hlsPlayer.media);
-  } else if (player.originalNode) {
-    source = context.createMediaElementSource(player.originalNode);
-  } else {
-    source = context.createMediaElementSource(player);
-  }
-
-  if (source) {
-    var analyser = context.createAnalyser()
-
-    const nyquistFrequency = context.sampleRate / 2
-    const frequencyData = new Uint8Array(analyser.frequencyBinCount)
+  /*   var context = new (window.AudioContext || window.webkitAudioContext)();
   
-    analyser.getByteFrequencyData(frequencyData)
-
-    console.log(`Frequency: ${analyser.frequencyBinCount}`)
-  }
+    var source;
+  
+    if (player.youTubeApi) {
+      var html5Player = player.youTubeApi
+        .getIframe()
+        .contentWindow.document.querySelector(".html5-main-video");
+  
+      source = context.createMediaElementSource(html5Player);
+    } else if (player.hlsPlayer) {
+      source = context.createMediaElementSource(player.hlsPlayer.media);
+    } else if (player.originalNode) {
+      source = context.createMediaElementSource(player.originalNode);
+    } else {
+      source = context.createMediaElementSource(player);
+    }
+  
+    console.log(`Source: ${source}`)
+  
+    if (source) {
+      var analyser = context.createAnalyser()
+  
+      const nyquistFrequency = context.sampleRate / 2
+      const frequencyData = new Uint8Array(analyser.frequencyBinCount)
+    
+      analyser.getByteFrequencyData(frequencyData)
+  
+      console.log(`Frequency: ${analyser.frequencyBinCount}`)
+    } */
 
 }
 
