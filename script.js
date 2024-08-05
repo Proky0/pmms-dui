@@ -278,7 +278,7 @@ function initPlayer(id, handle, options) {
           options.title = media.youTubeApi.getVideoData().title;
 
           const textAd = media.youTubeApi.getIframe().contentWindow.document.querySelector("[class^='ytp-ad-text']");
-          const buttonTest = media.youTubeApi.getIframe().contentWindow.document.querySelector("[id^='skip-button'] button, [class='ytp-skip-ad-button']")
+          const buttonTest = media.youTubeApi.getIframe().contentWindow.document.querySelector("[id^=skip-button].ytp-skip-ad-button")
           const skipButton = media.youTubeApi.getIframe().contentWindow.document.querySelector(`
             button.ytp-skip-ad-button,
             button.ytp-ad-skip-button-modern
