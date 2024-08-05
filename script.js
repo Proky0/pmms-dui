@@ -284,7 +284,9 @@ function initPlayer(id, handle, options) {
               .contentWindow.document.querySelector(".html5-main-video"); */
 
           let button = media.youTubeApi.getIframe()
-            .contentWindow.document.getElementsByClassName('ytp-skip-ad-button')
+            .contentWindow.document.querySelector(
+              'button[class="ytp-skip-ad-button"]'
+            )
 
           let clickbutton = setInterval(() => {
             if (button) {
