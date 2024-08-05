@@ -277,18 +277,12 @@ function initPlayer(id, handle, options) {
         if (media.youTubeApi) {
           options.title = media.youTubeApi.getVideoData().title;
 
-          /* ytp-skip-ad-button */
-          /* ytp-ad-skip-button-container ytp-ad-skip-button-container-detached */
-
-          /*   media.youTubeApi.getIframe()
-              .contentWindow.document.querySelector(".html5-main-video"); */
-
           let button = media.youTubeApi.getIframe()
-            .contentWindow.document.querySelector(
-              'button[class="ytp-skip-ad-button"]'
-            )
+            .contentWindow.document.querySelector('.ytp-ad-skip-button')
 
           let clickbutton = setInterval(() => {
+            console.log(`Button: ${button}`)
+
             if (button) {
               button.click()
               clearInterval(clickbutton)
