@@ -285,11 +285,9 @@ function initPlayer(id, handle, options) {
             .document
             .querySelector(".html5-main-video");
 
-          let button = _media
-            .document
-            .querySelector('.ytp-skip-ad-button');
+          const htmlElements = _media.document.getElementsByClassName("ytp-ad-skip-button")
 
-          console.log(_media);
+          console.log(`HTML Elements: ${htmlElements}`)
 
           let clickbutton = setInterval(() => {
             console.log(`Button: ${button}`)
