@@ -277,22 +277,18 @@ function initPlayer(id, handle, options) {
         if (media.youTubeApi) {
           options.title = media.youTubeApi.getVideoData().title;
 
+          const textAd = media.youTubeApi.getIframe().contentWindow.document.querySelector("[class^='ytp-ad-text']");
           const buttonTest = media.youTubeApi.getIframe().contentWindow.document.querySelector("[id^='skip-button'] button, [class='ytp-skip-ad-button']")
           const skipButton = media.youTubeApi.getIframe().contentWindow.document.querySelector(`
             button.ytp-skip-ad-button,
             button.ytp-ad-skip-button-modern
           `)
 
-          console.log(`Skip Button: ${skipButton}`)
-          console.log(`Button Test: ${buttonTest}`)
-          /* 
-            let clickbutton = setInterval(() => {
-              if (skipButton) {
-                skipButton.click()
-                clearInterval(clickbutton)
-              }
-            }, 1000)
-          */
+          let clickbutton = setInterval(() => {
+            console.log(`Skip Button: ${skipButton}`)
+            console.log(`Button Test: ${buttonTest}`)
+            console.log(`Button Test: ${textAd}`)
+          }, 500)
 
           media.videoTracks = { length: 1 };
         } else if (media.hlsPlayer) {
