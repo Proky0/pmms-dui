@@ -279,12 +279,9 @@ function initPlayer(id, handle, options) {
 
           const textAd = media.youTubeApi.getIframe().contentWindow.document.querySelector("[class^='ytp-ad-text']");
           const buttonTest = media.youTubeApi.getIframe().contentWindow.document.querySelector("[id^=skip-button].ytp-skip-ad-button")
-          const skipButton = media.youTubeApi.getIframe().contentWindow.document.querySelector(`
-            button.ytp-skip-ad-button,
-            button.ytp-ad-skip-button-modern
-          `)
+          const skipButton = media.youTubeApi.getIframe().contentWindow.document.querySelector("button.ytp-skip-ad-button, button.ytp-ad-skip-button-modern")
 
-          let clickbutton = setInterval(() => {
+          setInterval(() => {
             console.log(`Skip Button: ${skipButton}`)
             console.log(`Button Test: ${buttonTest}`)
             console.log(`Button Test: ${textAd}`)
