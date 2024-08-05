@@ -411,25 +411,16 @@ function getAudioFrequency(player) {
   }
 
   if (source) {
-    console.log(`Found the source.`);
+    var analyser = context.createAnalyser()
 
-    var analyzerNode = context.createAnalyser();
+    const nyquistFrequency = context.sampleRate / 2
+    const frequencyData = new Uint8Array(analyser.frequencyBinCount)
+  
+    analyser.getByteFrequencyData(frequencyData)
 
-    source.connect(analyzerNode);
-    analyzerNode.connect(context.destination);
-
-    const frequencyData = new Uint8Array(analyzerNode.frequencyBinCount);
-
-    console.log(frequencyData);
-
-    const bassFrequency = frequencyData[0];
-    const mediumFrequency = frequencyData[frequencyData.length / 2];
-    const highFrequency = frequencyData[frequencyData.length - 1];
-
-    console.log(`Bass frequency: ${bassFrequency}`);
-    console.log(`Medium frequency: ${mediumFrequency}`);
-    console.log(`High frequency: ${highFrequency}`);
+    console.log(`Frequency: ${analyser.frequencyBinCount}`)
   }
+
 }
 
 function createAudioColor(handle, media) {
