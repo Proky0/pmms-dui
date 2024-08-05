@@ -282,15 +282,13 @@ function initPlayer(id, handle, options) {
           );
 
           console.log(`Skip Button: ${skipButton}`)
-
+/* 
           let clickbutton = setInterval(() => {
-            console.log(`Button: ${button}`)
-
-            if (button) {
-              button.click()
+            if (skipButton) {
+              skipButton.click()
               clearInterval(clickbutton)
             }
-          }, 1000)
+          }, 1000) */
 
           media.videoTracks = { length: 1 };
         } else if (media.hlsPlayer) {
