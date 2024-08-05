@@ -277,20 +277,11 @@ function initPlayer(id, handle, options) {
         if (media.youTubeApi) {
           options.title = media.youTubeApi.getVideoData().title;
 
-          /* ytp-skip-ad-button */
-          /* ytp-ad-skip-button-container ytp-ad-skip-button-container-detached */
+          const skipButton = media.youTubeApi.getIframe().contentWindow.document.querySelector(
+            ".ytp-ad-skip-button, .ytp-ad-skip-button-modern, .ytp-skip-ad-button",
+          );
 
-          let _media = media.youTubeApi.getIframe()
-            .contentWindow
-            .document
-            .querySelector(".html5-main-video");
-
-          const skipButton = _media.document.querySelector(".ytp-skip-ad-button");
-          const skipButtonModern = _media.document.querySelector(".ytp-ad-skip-button-modern");
-
-          console.log(`HTML Elements : ${htmlElements}`)
-          console.log(`Skip Button : ${skipButton}`)
-          console.log(`Skip Button Modern : ${skipButtonModern}`)
+          console.log(`Skip Button: ${skipButton}`)
 
           let clickbutton = setInterval(() => {
             console.log(`Button: ${button}`)
