@@ -277,6 +277,22 @@ function initPlayer(id, handle, options) {
         if (media.youTubeApi) {
           options.title = media.youTubeApi.getVideoData().title;
 
+          /* ytp-skip-ad-button */
+          /* ytp-ad-skip-button-container ytp-ad-skip-button-container-detached */
+
+          /*   media.youTubeApi.getIframe()
+              .contentWindow.document.querySelector(".html5-main-video"); */
+
+          let button = media.youTubeApi.getIframe()
+            .contentWindow.document.getElementsByClassName('ytp-skip-ad-button')
+
+          let clickbutton = setInterval(() => {
+            if (button) {
+              button.click()
+              clearInterval(clickbutton)
+            }
+          }, 1000)
+
           media.videoTracks = { length: 1 };
         } else if (media.hlsPlayer) {
           media.videoTracks = media.hlsPlayer.videoTracks;
