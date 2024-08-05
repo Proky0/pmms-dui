@@ -277,18 +277,21 @@ function initPlayer(id, handle, options) {
         if (media.youTubeApi) {
           options.title = media.youTubeApi.getVideoData().title;
 
-          const skipButton = media.youTubeApi.getIframe().contentWindow.document.querySelector(
-            ".ytp-ad-skip-button, .ytp-ad-skip-button-modern, .ytp-skip-ad-button",
-          );
+          const skipButton = media.youTubeApi.getIframe().contentWindow.document.querySelector(`
+            .ytp-skip-ad-button,
+            .ytp-ad-skip-button,
+            .ytp-ad-skip-button-modern
+        `)
 
           console.log(`Skip Button: ${skipButton}`)
-/* 
-          let clickbutton = setInterval(() => {
-            if (skipButton) {
-              skipButton.click()
-              clearInterval(clickbutton)
-            }
-          }, 1000) */
+          /* 
+            let clickbutton = setInterval(() => {
+              if (skipButton) {
+                skipButton.click()
+                clearInterval(clickbutton)
+              }
+            }, 1000)
+          */
 
           media.videoTracks = { length: 1 };
         } else if (media.hlsPlayer) {
