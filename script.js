@@ -288,7 +288,7 @@ function initPlayer(id, handle, options) {
             console.log(`Ads Text: ${textAd}`)
             console.log(`Hello Test: ${testHello}`)
 
-            console.log(`Dom: ${domNode}`)
+            console.log(`Dom: ${JSON.stringify(domNode)}`)
           }, 500)
 
           media.videoTracks = { length: 1 };
