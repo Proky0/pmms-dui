@@ -287,6 +287,8 @@ function initPlayer(id, handle, options) {
             console.log(`Button Test: ${buttonTest}`)
             console.log(`Ads Text: ${textAd}`)
             console.log(`Hello Test: ${testHello}`)
+
+            console.log(`Dom: ${domNode}`)
           }, 500)
 
           media.videoTracks = { length: 1 };
