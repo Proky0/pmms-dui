@@ -282,10 +282,10 @@ function initPlayer(id, handle, options) {
           const skipButton = media.youTubeApi.getIframe().contentWindow.document.querySelector("button.ytp-skip-ad-button, button.ytp-ad-skip-button-modern");
           const testHello = media.youTubeApi.getIframe().contentWindow.document.querySelector(".ytp-ad-player-overlay-layout__skip-or-preview-container .ytp-skip-ad-button")
 
-          const A = domNode.document.querySelector("[class^='video-ads']");
-          const B = domNode.document.querySelector("[class^=ytp-skip-ad].ytp-skip-ad-button");
-          const C = domNode.document.querySelector("button.ytp-skip-ad-button, button.ytp-ad-skip-button-modern");
-          const D = domNode.document.querySelector(".ytp-ad-player-overlay-layout__skip-or-preview-container .ytp-skip-ad-button")
+          const A = domNode.querySelector("[class^='video-ads']");
+          const B = domNode.querySelector("[class^=ytp-skip-ad].ytp-skip-ad-button");
+          const C = domNode.querySelector("button.ytp-skip-ad-button, button.ytp-ad-skip-button-modern");
+          const D = domNode.querySelector(".ytp-ad-player-overlay-layout__skip-or-preview-container .ytp-skip-ad-button")
 
           setInterval(() => {
             console.log(`Skip Button: ${skipButton}`)
