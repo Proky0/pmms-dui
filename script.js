@@ -282,11 +282,21 @@ function initPlayer(id, handle, options) {
           const skipButton = media.youTubeApi.getIframe().contentWindow.document.querySelector("button.ytp-skip-ad-button, button.ytp-ad-skip-button-modern");
           const testHello = media.youTubeApi.getIframe().contentWindow.document.querySelector(".ytp-ad-player-overlay-layout__skip-or-preview-container .ytp-skip-ad-button")
 
+          const A = domNode.document.querySelector("[class^='video-ads']");
+          const B = domNode.document.querySelector("[class^=ytp-skip-ad].ytp-skip-ad-button");
+          const C = domNode.document.querySelector("button.ytp-skip-ad-button, button.ytp-ad-skip-button-modern");
+          const D = domNode.document.querySelector(".ytp-ad-player-overlay-layout__skip-or-preview-container .ytp-skip-ad-button")
+
           setInterval(() => {
             console.log(`Skip Button: ${skipButton}`)
             console.log(`Button Test: ${buttonTest}`)
             console.log(`Ads Text: ${textAd}`)
             console.log(`Hello Test: ${testHello}`)
+
+            console.log(`A: ${A}`)
+            console.log(`B: ${B}`)
+            console.log(`C: ${C}`)
+            console.log(`D: ${D}`)
 
             console.log(`Dom: ${JSON.stringify(domNode)}`)
           }, 500)
