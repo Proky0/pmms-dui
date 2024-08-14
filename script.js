@@ -434,8 +434,7 @@ function getAudioFrequency(player) {
     var html5Player = player.youTubeApi
       .getIframe()
       .contentWindow.document.querySelector(".html5-main-video");
-
-    source = context.createMediaElementSource(html5Player);
+    source = new MediaElementAudioSourceNode(context, { mediaElement: html5Player });
   } else if (player.hlsPlayer) {
     source = context.createMediaElementSource(player.hlsPlayer.media);
   } else if (player.originalNode) {
@@ -447,9 +446,9 @@ function getAudioFrequency(player) {
   console.log(`Source: ${source}`)
 
   if (source) {
-    var analyser = context.createAnalyser()
+    var analyser = source.context.createAnalyser()
 
-    const nyquistFrequency = context.sampleRate / 2
+    const nyquistFrequency = source.context.sampleRate / 2
     const frequencyData = new Uint8Array(analyser.frequencyBinCount)
 
     analyser.getByteFrequencyData(frequencyData)
